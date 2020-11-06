@@ -121,7 +121,7 @@ public class ParserClassGenerator extends AbstractGenerator {
             builder.beginControlFlow("while (keys.hasNext())");
             builder.addStatement("String key = keys.next();");
 
-            if (isPrimary(genericType) || isString(genericType)) {
+            if (isPrimaryOrString(genericType)) {
                 tryGetPrimaryAndStringStatement(builder, genericType, fieldName);
             } else {
                 ClassName parseClass = generateClass(element);
@@ -142,7 +142,7 @@ public class ParserClassGenerator extends AbstractGenerator {
             builder.addStatement("$T<$T> $LList = new $T<$T>(len)", ArrayList.class, className, fieldName, ArrayList.class, className);
             builder.beginControlFlow("for (int i = 0; i < len; i ++)");
 
-            if (isPrimary(genericType) || isString(genericType)) {
+            if (isPrimaryOrString(genericType)) {
                 tryGetPrimaryAndStringFromArray(builder, genericType, fieldName);
             } else {
                 ClassName parseClass = generateClass(element);
@@ -163,7 +163,7 @@ public class ParserClassGenerator extends AbstractGenerator {
             builder.addStatement("$T[] $LArray = new $T[len]", className, fieldName, className);
             builder.beginControlFlow("for (int i = 0; i < len; i ++)");
 
-            if (isPrimary(componentType) || isString(componentType)) {
+            if (isPrimaryOrString(componentType)) {
                 tryGetPrimaryAndStringFromArray(builder, componentType, fieldName);
             } else {
                 ClassName parseClass = generateClass((TypeElement) mTypeUtils.asElement(componentType));
@@ -218,13 +218,12 @@ public class ParserClassGenerator extends AbstractGenerator {
 
     private boolean isPrimaryOrString(TypeMirror typeMirror) {
         TypeKind kind = typeMirror.getKind();
-        return kind == TypeKind.INT || TypesUtils.isString(typeMirror) || kind == TypeKind.LONG || kind == TypeKind.DOUBLE
-            || kind == TypeKind.FLOAT || kind == TypeKind.BYTE || TypesUtils.isBooleanType(typeMirror);
+        return TypesUtils.isPrimitive(typeMirror) || TypesUtils.isBooleanType(typeMirror) || TypesUtils.isIntegerType(typeMirror) || TypesUtils.isString(typeMirror);
     }
 
     private boolean tryAddPrimaryAndStringStatement(MethodSpec.Builder builder, TypeMirror fieldClass, String fieldName, String jsonName,
                                                     boolean isGetterSetter, ExecutableElement setter, ExecutableElement getter) {
-        if (fieldClass.getKind() == TypeKind.INT) {
+        if (TypesUtils.isIntegerType(fieldClass)) {
             addPrimaryStatement(builder, fieldName, jsonName, "Int", isGetterSetter, setter, getter);
         } else if (TypesUtils.isString(fieldClass)) {
             addPrimaryStatement(builder, fieldName, jsonName, "String", isGetterSetter, setter, getter);
@@ -246,7 +245,7 @@ public class ParserClassGenerator extends AbstractGenerator {
     }
 
     private boolean tryGetPrimaryAndStringStatement(MethodSpec.Builder builder, TypeMirror fieldClass, String fieldName) {
-        if (fieldClass.getKind() == TypeKind.INT) {
+        if (TypesUtils.isIntegerType(fieldClass)) {
             getPrimary(builder, int.class, fieldName, "Int");
         } else if (TypesUtils.isString(fieldClass)) {
             getPrimary(builder, String.class, fieldName, "String");
@@ -268,7 +267,7 @@ public class ParserClassGenerator extends AbstractGenerator {
     }
 
     private boolean tryGetPrimaryAndStringFromArray(MethodSpec.Builder builder, TypeMirror fieldClass, String fieldName) {
-        if (fieldClass.getKind() == TypeKind.INT) {
+        if (TypesUtils.isIntegerType(fieldClass)) {
             getPrimaryFromArray(builder, int.class, fieldName, "Int");
         } else if (TypesUtils.isString(fieldClass)) {
             getPrimaryFromArray(builder, String.class, fieldName, "String");
@@ -334,13 +333,4 @@ public class ParserClassGenerator extends AbstractGenerator {
             }
         }
     }
-
-    private boolean isPrimary(TypeMirror type) {
-        return TypesUtils.isPrimitive(type);
-    }
-
-    private boolean isString(TypeMirror type) {
-        return TypesUtils.isString(type);
-    }
-
 }

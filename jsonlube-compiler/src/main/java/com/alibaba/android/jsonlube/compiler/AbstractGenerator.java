@@ -18,6 +18,7 @@ package com.alibaba.android.jsonlube.compiler;
 
 import com.alibaba.android.jsonlube.JsonLubeField;
 import com.alibaba.android.jsonlube.ProguardKeep;
+import com.alibaba.android.jsonlube.IgnoreField;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
@@ -29,6 +30,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 public abstract class AbstractGenerator {
@@ -94,6 +96,12 @@ public abstract class AbstractGenerator {
             return true;
         }
 
+        Annotation annotation = field.getAnnotation(IgnoreField.class);
+        System.out.println("isValidSetter, field=" + field + ", annotation=" + annotation);
+        if (annotation != null) {
+            return true;
+        }
+
         return false;
     }
 
@@ -113,6 +121,12 @@ public abstract class AbstractGenerator {
         String name = getNameFromGetterSetter(method);
         VariableElement field = ElementUtils.findFieldIn(type, name, mElementUtils);
         if (field != null && ElementUtils.isPublic(field)) {
+            return false;
+        }
+
+        Annotation annotation = method.getAnnotation(IgnoreField.class);
+        System.out.println("isValidSetter, method=" + method + ", annotation=" + annotation);
+        if (annotation != null) {
             return false;
         }
 
