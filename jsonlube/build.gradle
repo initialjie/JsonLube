@@ -116,6 +116,9 @@ android {
 
 dependencies {
     compile files(fileTree(dir: 'lib', includes: ['*.jar']))
-    compile group:'com.alibaba.android', name :'jsonlube-annotations', version :'1.0.0.3'
+    implementation project(':jsonlube-annotations')
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
+
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.initialjie'

@@ -219,6 +219,18 @@ public final class TypesUtils {
     }
 
     /**
+     * Checks if the type represents a int type, that is either boolean (primitive type) or
+     * java.lang.Integer.
+     *
+     * @param type the type to test
+     * @return true iff type represents a boolean type
+     */
+    public static boolean isIntegerType(TypeMirror type) {
+        return isDeclaredOfName(type, "java.lang.Integer")
+                || type.getKind().equals(TypeKind.INT);
+    }
+
+    /**
      * Check if the type represents a declared type of the given qualified name.
      *
      * @param type the type

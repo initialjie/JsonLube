@@ -93,3 +93,6 @@ dependencies {
     testImplementation group: 'com.vaadin.external.google', name: 'android-json', version: '0.0.20131108.vaadin1'
     implementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)
 }
+
+apply plugin: 'com.github.dcendents.android-maven'
+group='com.github.initialjie'
